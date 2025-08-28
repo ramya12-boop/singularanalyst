@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home</title>
+  <style>
+  
+  footer {
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 15px 20px;
+  position: relative;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-in;
+}
+
+footer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background-color: #f0f0f0;
+    }
+
+   nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white; /* White bar */
+  padding: 10px 30px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+}
+
+
+    .nav-left {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    nav img.logo {
+      height: 40px;
+    }
+
+    nav a {
+  color: black; /* Black text for links */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav .logout {
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+
+.hero-section { position: relative; height: 100vh; overflow: hidden; background: #000; }
+
+  /* Slide layers */
+  .slides, .slide { position: absolute; inset: 0; }
+  .slides { isolation: isolate; }
+  .slide {
+    background-image: var(--bg);
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 900ms ease;
+    /* Make images feel "thicker": deeper contrast + saturation + subtle darkening */
+    filter: saturate(1.25) contrast(1.2) brightness(0.92);
+    transform: scale(1.02); /* slight presence */
+  }
+  .slide.is-active { opacity: 1; }
+
+  /* Lighten the global overlay so the background feels bolder */
+  .hero-section::after{
+    content:""; position:absolute; inset:0; z-index: 1;
+    background: linear-gradient(0deg, rgba(0,0,0,.20), rgba(0,0,0,.12));
+  }
+
+  /* ===== Pop-up overlays container (kept in same order as slides) ===== */
+  .overlays{ position:absolute; inset:0; z-index: 2; pointer-events:none; }
+
+  /* Individual light popup (transparent) */
+  .welcome-overlay{
+    position: absolute; left: 5vw; bottom: 8vh; width: min(560px, 88vw);
+    background: rgba(0, 0, 0, 0.5); /* lighter, semi-transparent */
+    color: #f3f5f5e9;
+    padding: 26px 26px 22px; border-radius: 16px; backdrop-filter: blur(6px);
+    box-shadow: 0 18px 50px rgba(235, 233, 233, 0.928);
+    transform: translateY(16px);
+    opacity: 0;
+    transition: opacity .25s ease, transform .25s ease, box-shadow .2s ease;
+    
+  }
+  .welcome-overlay.is-active{ opacity: 1; transform: translateY(0); pointer-events:auto; }
+  .hero-section:hover .welcome-overlay.is-active{ box-shadow: 0 22px 60px rgba(120, 118, 118, 0.25); }
+
+  .welcome-overlay h1{ font-size: clamp(28px, 3.2vw, 40px); font-weight: 800; letter-spacing:.3px; margin: 2px 0 8px; }
+  .welcome-overlay .accent{ color:#eeeef3ed; }
+  .welcome-overlay p{ line-height: 1.6; color:#dedada; margin: 0 0 14px; }
+  .overlay-mark{ width: 34px; height: 34px; opacity:.95; display:block; margin-bottom: 6px; }
+
+  /* Buttons for light popup */
+  .btn{ display:inline-block; text-decoration:none; font-weight:700; padding: 10px 18px; border-radius: 24px; transition: .25s ease; border: 2px solid transparent; }
+  .btn.primary{ background:#111; color:#fff; }
+  .btn.primary:hover{ transform: translateY(-1px); }
+  .btn.ghost{ background:transparent; color:#111; border-color:#111; margin-left:10px; }
+  .btn.ghost:hover{ background:#111; color:#fff; }
+
+  /* Dots */
+  .dots{ position:absolute; right: 18px; top: 50%; transform: translateY(-50%); display:flex; flex-direction:column; gap:10px; z-index:3; }
+  .dot{ width: 10px; height: 10px; border-radius: 999px; background: rgba(255,255,255,.55); border: 0; cursor: pointer; transition: transform .2s ease, background .2s ease; }
+  .dot.is-active{ background: #fff; transform: scale(1.25); }
+
+  @media (max-width: 720px){
+    .welcome-overlay{ left: 4vw; right: 4vw; width: auto; bottom: 6vh; }
+    .dots{ right: 12px; }
+  }
+
+    .hero{
+      position:relative; overflow:hidden; height:380px; display:grid; place-items:center;
+      background:  linear-gradient(135deg, #e2e4e5, #b1dff6);
+      color:#1a1a1a;
+    }
+    .hero::before, .hero::after{
+      content:""; position:absolute; inset:-15% -10% auto -10%; height:70%;
+      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
+      transform: skewY(-8deg) rotate(-4deg);
+    }
+    .hero::after{
+      inset:auto -15% -18% -15%; height:75%;
+      background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+      transform: skewY(10deg) rotate(6deg);
+    }
+    .shape{position:absolute;border-radius:16px;opacity:.9;mix-blend:screen}
+    .s1{width:180px;height:180px;left:6%;top:14%;background:#faa2db;transform:rotate(20deg)}
+    .s2{width:110px;height:110px;right:12%;top:18%;background:#50e796;transform:rotate(-18deg)}
+    .s3{width:140px;height:140px;right:20%;bottom:6%;background:#ffd000;transform:rotate(12deg)}
+    .tick{position:absolute;width:56px;height:8px;background:#fff;border-radius:100px;opacity:.85}
+    .t1{left:7%;top:42%;transform:rotate(-18deg)}
+    .t2{left:10%;top:50%;transform:rotate(-18deg)}
+    .t3{left:13%;top:58%;transform:rotate(-18deg)}
+
+    .hero-inner{position:relative;z-index:1;text-align:center;max-width:760px;padding:0 24px}
+    .eyebrow{letter-spacing:.25em;opacity:.85;margin-bottom:8px}
+    .hero h1{font-size:clamp(28px,4vw,48px);margin:6px 0 10px}
+    .hero p{opacity:.95;max-width:680px;margin:0 auto;line-height:1.6}
+ section{padding:72px 26px}
+    .wrap{max-width:1100px;margin:0 auto}
+
+    /* About block (two-column like screenshot) */
+    .about-grid{
+      background: var(--card);
+      border-radius:20px;
+      box-shadow: var(--shadow);
+      display:grid; grid-template-columns: 1.1fr 1fr; gap:30px;
+      padding:32px;
+    }
+    .about-text h2{font-size:clamp(24px,3vw,36px);margin:0 0 10px}
+    .about-text p{color:var(--muted);line-height:1.85;margin:0 0 12px}
+    .about-img{
+      border-radius:16px; overflow:hidden; box-shadow:0 12px 26px rgba(2,6,23,.20);
+      background:#eef2ff; min-height:280px;
+      background-image:url('/images/about-building.jpg'); /* replace with your image */
+      background-size:cover; background-position:center;
+    }
+
+    /* Features mini-cards */
+    .features{margin-top:28px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    .feat{
+      background:#fff;border-radius:14px;box-shadow:0 8px 18px rgba(0,0,0,.08);
+      padding:16px 18px;
+    }
+    .feat h3{margin:0 0 6px;font-size:18px}
+    .feat p{margin:0;color:var(--muted);line-height:1.6}
+
+   
+    /* Values */
+    .values{padding:72px 26px;background:#fff;text-align:center}
+    .values h2{font-size:32px;margin-bottom:40px}
+    .values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+    .value{padding:20px;background:#f7f9fc;border-radius:16px;box-shadow:0 8px 18px rgba(0,0,0,.06)}
+    .icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+          margin:0 auto 12px;font-size:24px;color:#fff}
+    .blue{background:#3b82f6}
+    .green{background:#22c55e}
+    .purple{background:#8b5cf6}
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .about-grid{grid-template-columns:1fr; padding:24px}
+      .about-img{min-height:220px}
+      .features{grid-template-columns:1fr 1fr}
+      .team-grid, .values-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width: 620px){
+      .features{grid-template-columns:1fr}
+      .team-grid, .values-grid{grid-template-columns:1fr}
+    }
+
+
+
+    .services-section {
+      padding: 60px 30px;
+      background: #f8f8f8;
+      text-align: center;
+    }
+
+    .services-section h2 {
+      margin-bottom: 30px;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 20px;
+    }
+
+    .slider {
+      display: flex;
+      gap: 20px;
+      overflow: hidden;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+    }
+
+    .slider::-webkit-scrollbar {
+      display: none;
+    }
+
+    .card {
+      min-width: 250px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .card button {
+      background-color: #111;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .slide-btn {
+      background: #333;
+      color: white;
+      border: none;
+      font-size: 2rem;
+      padding: 10px;
+      cursor: pointer;
+    }
+    /* ===== HRMS (image-style) ===== */
+.hrms-slice{
+  background: #f7f9fc;
+  padding: 80px 30px;
+}
+.hrms-wrap{
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.hrms-left small.tag{
+  letter-spacing: .25em;
+  color: #7a8aa0;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.hrms-left h2{
+  font-size: clamp(26px, 3.2vw, 42px);
+  color: #0a2540;
+  line-height: 1.15;
+  margin: 6px 0 12px;
+}
+.hrms-left p{
+  color:#3d5872;
+  line-height: 1.8;
+  max-width: 600px;
+}
+
+/* cards grid */
+.hrms-cards{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.hrms-card{
+  background:#fff;
+  border-radius: 14px;
+  padding: 20px 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+.hrms-card .icon{
+  width: 46px; height: 46px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  margin-bottom: 12px;
+  font-size: 22px;
+}
+.icon.blue  { background:#eaf2ff; color:#0b63ff; }
+.icon.green { background:#eaf9f0; color:#1a9a4b; }
+.icon.pink  { background:#fdeaf1; color:#d63d7a; }
+.icon.purp  { background:#efe9ff; color:#6a47d6; }
+
+.hrms-card h3{ margin: 2px 0 6px; color:#0a2540; }
+.hrms-card p { margin: 0; color:#3b4b5e; line-height: 1.6; }
+
+/* responsive */
+@media (max-width: 900px){
+  .hrms-wrap{ grid-template-columns: 1fr; }
+  .hrms-left{ text-align:left; }
+}
+
+    .career-section {
+  background-image: url('/images/career-banner.jpg');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-align: center;
+  padding: 150px 30px 180px; /* Increased top and bottom padding */
+  position: relative;
+  min-height: 80vh; /* Optional: ensure vertical height */
+}
+
+
+.career-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Optional dark overlay */
+  z-index: 0;
+}
+
+.career-banner {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.career-banner h2 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.career-banner p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.career-btn {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.career-btn:hover {
+  background: #eee;
+}
+
+.client-section {
+  padding: 80px 30px;
+  background: #fff;
+  text-align: center;
+}
+
+.client-logos {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.client-logo {
+  width: 100px;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+/* Staggered animation delay */
+.client-logo:nth-child(1) { animation-delay: 0s; }
+.client-logo:nth-child(2) { animation-delay: 0.2s; }
+.client-logo:nth-child(3) { animation-delay: 0.4s; }
+.client-logo:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.client-description {
+  max-width: 800px;
+  margin: 40px auto 60px;
+  text-align: center;
+  color: #333;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+.visit-section {
+  background: linear-gradient(to bottom right, #f7fafd, #e9eff5);
+  padding: 80px 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.visit-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.visit-heading {
+  font-size: 2.5rem;
+  color: #002d5e;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.visit-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.info-container {
+  flex: 1;
+  min-width: 250px;
+  font-size: 1.1rem;
+  color: #333;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  line-height: 1.8;
+}
+
+.info-container a {
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.info-container a:hover {
+  text-decoration: underline;
+}
+.everify-section {
+  background-color: #f9f9f9;
+  text-align: center;
+  padding: 50px 20px 0;
+}
+
+.everify-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.everify-logo {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.everify-text {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+.footer-bar {
+  background-color: #0077d6;
+  color: white;
+  padding: 15px 0;
+  font-size: 0.95rem;
+}
+
+  </style>
+</head>
+<body>
+
+  <nav>
+  <div class="nav-left">
+    <img src="/images/logo.jpg" alt="Logo" class="logo">
+    <a href="#">Home</a>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#career">Career</a>
+    <a href="#clients">Clients</a>
+    <a href="#visit">Visit Us</a>
+
+  </div>
+  <a href="/logout" class="logout">Logout</a>
+</nav>
+
+ <section class="hero-section" id="welcome">
+    <!-- Slides -->
+    <div class="slides" aria-live="polite">
+      <div class="slide is-active" style="--bg:url('/images/slide-1.jpg')"></div>
+      <div class="slide"         style="--bg:url('/images/slide-2.jpg')"></div>
+      <!-- Add more slides as needed -->
+    </div>
+
+    <!-- POP-UP boxes (one per slide, same order as slides) -->
+    <div class="overlays">
+      <!-- Box for slide 1 -->
+      <div class="welcome-overlay is-active">
+        <img src="/images/logo-mark.png" alt="" class="overlay-mark" />
+        <h1>HRMS</h1>
+        <p>HRMS is a smart solution that automates payroll, recruitment, attendance, and performance management, ensuring accuracy, transparency, and efficiency while empowering employees and transforming HR into a strategic business partner.</p>
+        <div class="cta-row">
+          <a href="#services" class="btn primary">See How It Works</a>
+          
+        </div>
+      </div>
+
+      <!-- Box for slide 2 -->
+      <div class="welcome-overlay">
+        <img src="/images/logo-mark.png" alt="" class="overlay-mark" />
+        <h1>HCM</h1>
+        <p>HCM (Human Capital Management) focuses on managing workforce lifecycle, including recruitment, onboarding, training, payroll, and performance, enabling organizations to optimize talent, boost productivity, ensure compliance, and drive overall business growth effectively.
+</p>
+        <div class="cta-row">
+          <a href="#services" class="btn primary">See How It Works</a>
+          
+        </div>
+      </div>
+
+      <!-- Add more .welcome-overlay blocks to match any extra slides -->
+    </div>
+
+    <!-- Dots -->
+    <div class="dots" role="tablist" aria-label="Welcome slideshow">
+      <button class="dot is-active" aria-label="Go to slide 1" aria-selected="true"></button>
+      <button class="dot"           aria-label="Go to slide 2" aria-selected="false"></button>
+      <!-- Add a dot per slide -->
+    </div>
+  </section>
+<header class="hero">
+  
+  <div class="tick t1"></div>
+  <div class="tick t2"></div>
+  <div class="tick t3"></div>
+
+  <div class="hero-inner">
+    <div class="eyebrow">ABOUT US</div>
+    <h1>Driving Growth with Technology & Trust</h1>
+    <p>We combine innovation, engineering discipline, and client-first focus to deliver scalable and secure solutions.</p>
+  </div>
+</header>
+<section>
+    <div class="wrap">
+      <div class="about-grid">
+        <div class="about-text">
+          <h2>About Singular Analysts Inc</h2>
+          <p>Founded in 2012, we deliver end-to-end software development and IT consulting. Our teams build cloud-native, secure, and data-driven systems that scale.</p>
+          <p>We partner long-term with clients, integrating with their processes to accelerate delivery and reduce risk. Agile, DevOps, and a culture of continuous improvement guide how we work.</p>
+          <p>What sets us apart is our focus on results: measurable impact, transparent communication, and products your users love.</p>
+        </div>
+        <div class="about-img"></div>
+      </div>
+
+      <!-- Feature bullets -->
+      <div class="features">
+        <div class="feat">
+          <h3>Full-Stack Delivery</h3>
+          <p>Front-end, back-end, data, QA, and DevOps under one roof with clear ownership.</p>
+        </div>
+        <div class="feat">
+          <h3>Cloud & Security</h3>
+          <p>AWS/Azure, IaC, observability, role-based access, and compliance-friendly architectures.</p>
+        </div>
+        <div class="feat">
+          <h3>Partnership Model</h3>
+          <p>We align to your roadmap, embed with your teams, and commit to outcomes—not just outputs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <!-- Values -->
+  <section class="values">
+    <div class="wrap">
+      <h2>Our Values</h2>
+      <div class="values-grid">
+        <div class="value">
+          <div class="icon blue">🤝</div>
+          <h3>Trust</h3>
+          <p>We build lasting partnerships through integrity and transparency.</p>
+        </div>
+        <div class="value">
+          <div class="icon green">💡</div>
+          <h3>Innovation</h3>
+          <p>We embrace modern technology to deliver scalable solutions.</p>
+        </div>
+        <div class="value">
+          <div class="icon purple">🚀</div>
+          <h3>Client Success</h3>
+          <p>Your growth is our mission; we measure success by your outcomes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
+
+<section id="services" class="services-section">
+    <h2>Our Services</h2>
+    <div class="slider-container">
+      <button class="slide-btn" onclick="scrollServices(-1)">&#10094;</button>
+      <div class="slider" id="serviceSlider">
+        <div class="card">
+          <img src="/images/service/it-service.jpg" alt="IT Services">
+          <h3>IT Services</h3>
+          <p>We help you achieve the qualities in your IT strategy by providing you application development and management services.</p>
+        
+        </div>
+        <div class="card">
+          <img src="/images/service/staffing-service.jpg" alt="Staffing Services">
+          <h3>Staffing Services</h3>
+          <p>Permanency and commitment are attributes that not only people, but companies seek too. Providing permanent recruitment solutions.</p>
+         
+        </div>
+        <div class="card">
+          <img src="/images/service/direct-placement.jpg" alt="Direct Placements">
+          <h3>Direct Placements</h3>
+          <p>Connect with full-time professionals who have the skills and personalities to match your business goals and your culture.</p>
+          
+        </div>
+        <div class="card">
+          <img src="/images/service/quality-assurance.jpg" alt="Quality Assurance">
+          <h3>Quality Assurance</h3>
+          <p>We maintain a desired level of quality in our service or product, especially by means of attention to every stage of the process of delivery or production.</p>
+          
+        </div>
+      </div>
+      <button class="slide-btn" onclick="scrollServices(1)">&#10095;</button>
+    </div>
+  </section>
+  
+<section id="hrms" class="hrms-slice">
+  <div class="hrms-wrap">
+    <div class="hrms-left">
+      <small class="tag">ABOUT</small>
+      <h2>Human Resource Management System</h2>
+      <p>
+        HRMS integrates essential HR functions into one platform, making processes faster, accurate, and employee-friendly. Key modules like Payroll, Onboarding, Leave, and Attendance ensure smooth operations and improved workforce management for any organization.HRMS is a powerful digital solution that automates payroll, onboarding, leave, attendance, and performance. It replaces manual processes with accurate, efficient workflows, ensuring compliance and transparency. With centralized data, real-time tracking, and seamless employee experiences, HRMS reduces administrative burden, boosts productivity, and empowers smarter workforce management.
+        <p>
+          <p>
+            <p>
+          
+          HRMS goes beyond basic HR tasks with performance management and analytics, helping organizations track progress, identify gaps, and improve productivity. Cloud-based and mobile-friendly, it empowers employees with self-service tools, reduces costs, minimizes errors, ensures compliance, and transforms HR into a strategic, technology-driven function driving organizational success.
+      </p>
+      
+    </div>
+
+    <div class="hrms-cards">
+      <article class="hrms-card">
+        
+        <h3>Onboarding</h3>
+        <p>HRMS streamlines onboarding with digital document collection, role assignments, and orientation, creating a smooth experience that boosts engagement from day one.</p>
+      </article>
+
+      <article class="hrms-card">
+        
+        <h3>Attendance & Leave</h3>
+        <p>HRMS unifies leave and attendance management, enabling digital requests, real-time tracking, accurate records, compliance, reduced errors, and seamless integration with payroll.</p>
+      </article>
+
+      <article class="hrms-card">
+       
+        <h3>Payroll</h3>
+        <p>HRMS automates salary processing, tax deductions, and payslips, ensuring accuracy, reducing errors, saving time, and providing employees with transparent, reliable payroll.</p>
+      </article>
+
+      <article class="hrms-card">
+        <div class="icon purp">📸</div>
+        <h3>Performance & Analytics</h3>
+        <p>HRMS Performance & Analytics track employee progress, provide insights, identify skill gaps, and support data-driven decisions to boost productivity and growth.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+  <section id="career" class="career-section">
+  <div class="career-banner">
+    <h2>Build Your Future with Us</h2>
+    <p>Explore opportunities to grow, lead, and make an impact.</p>
+    <a href="/career.html" class="career-btn">View Openings</a>
+  </div>
+</section>
+<section class="client-section" id="clients">
+  <h2>Our Clients</h2>
+  <div class="client-logos">
+    <img src="/images/client1.png" class="client-logo" alt="Client 1" />
+    <img src="/images/client2.png" class="client-logo" alt="Client 2" />
+    <img src="/images/client3.png" class="client-logo" alt="Client 3" />
+    <img src="/images/client4.png" class="client-logo" alt="Client 4" />
+  </div>
+  <div class="client-description">
+  <p>
+    We have the privilege of working with some of the most well known companies in the world and we don’t take this lightly.
+    Our clients engage us in a number of ways—we help them solve business problems, increase visibility and help them thrive in a networked world 
+    where customers and employees have become increasingly empowered. We view our clients as partners and work collaboratively with them 
+    to achieve results they can measure.
+  </p>
+</div>
+<section class="visit-section" id="visit">
+  <div class="visit-wrapper">
+    <h2 class="visit-heading">Visit Us</h2>
+    <div class="visit-content">
+      <div class="map-container">
+        <iframe 
+          src="https://www.google.com/maps?q=17440+Dallas+Pkwy+%23250,+Dallas,+TX+75287&output=embed"
+          width="100%" 
+          height="300" 
+          style="border:0; border-radius: 12px;" 
+          allowfullscreen="" 
+          loading="lazy">
+        </iframe>
+      </div>
+      <div class="info-container">
+        <p><strong>Address:</strong><br>17440 Dallas Pkwy #250<br>Dallas, TX 75287<br>USA</p>
+        <p><strong>Phone:</strong> +1 614 371 4388</p>
+        <p><strong>Email:</strong> <a href="mailto:hr@singularanalysts.com">hr@singularanalysts.com</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="everify-section">
+  <div class="everify-container">
+    <img src="/images/e-verify.png" alt="E-Verify Logo" class="everify-logo" />
+    <p class="everify-text">
+      E-Verify® is a registered trademark of the U.S. Department of Homeland Security.
+    </p>
+  </div>
+  <footer id="site-footer">
+  &copy; 2025 Singular Analysts Inc. All rights reserved.
+</footer>
+</section>
+
+
+
+</section>
+
+  <script>
+  const slider = document.getElementById("serviceSlider");
+  const cards = slider.querySelectorAll('.card');
+  const cardCount = cards.length;
+  const cardWidth = cards[0].offsetWidth + 20;
+
+  // Clone cards to enable looping
+  cards.forEach(card => {
+    const clone = card.cloneNode(true);
+    slider.appendChild(clone);
+  });
+
+  let scrollAmount = 0;
+
+  function scrollServices(direction) {
+    scrollAmount += direction * cardWidth;
+    if (scrollAmount >= slider.scrollWidth / 2) scrollAmount = 0;
+    if (scrollAmount < 0) scrollAmount = slider.scrollWidth / 2 - cardWidth;
+    slider.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+  }
+  
+</script>
+<script>
+  const footer = document.getElementById('site-footer');
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          footer.classList.add('visible');
+        }
+      });
+    },
+    {
+      threshold: 0.1
+    }
+  );
+
+  observer.observe(footer);
+</script>
+ <script>
+  /* ===== Slideshow + per-slide popup sync ===== */
+  (function(){
+    const root   = document.getElementById('welcome');
+    const slides = [...root.querySelectorAll('.slide')];
+    const dots   = [...root.querySelectorAll('.dot')];
+    const boxes  = [...root.querySelectorAll('.welcome-overlay')]; // NEW: per-slide popups
+
+    let i = 0, timer = null, interval = 5500, isPaused = false;
+
+    function setActive(idx){
+      // slides
+      slides[i].classList.remove('is-active');
+      dots[i].classList.remove('is-active'); dots[i].setAttribute('aria-selected','false');
+      boxes[i].classList.remove('is-active'); // hide old popup
+
+      i = (idx + slides.length) % slides.length;
+
+      slides[i].classList.add('is-active');
+      dots[i].classList.add('is-active'); dots[i].setAttribute('aria-selected','true');
+      boxes[i].classList.add('is-active'); // show matching popup
+    }
+
+    function next(){ setActive(i+1); }
+    function play(){ timer = setInterval(next, interval); }
+    function stop(){ clearInterval(timer); timer = null; }
+
+    // dots click
+    dots.forEach((d, idx) => d.addEventListener('click', () => { stop(); setActive(idx); play(); }));
+
+    // pause on hover / resume on leave
+    root.addEventListener('mouseenter', () => { isPaused = true; stop(); });
+    root.addEventListener('mouseleave', () => { if(isPaused){ isPaused=false; play(); } });
+
+    // swipe support (simple)
+    let startX = null;
+    root.addEventListener('touchstart', e => startX = e.touches[0].clientX, {passive:true});
+    root.addEventListener('touchend', e => {
+      if(startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if(Math.abs(dx) > 40){ stop(); setActive(i + (dx < 0 ? 1 : -1)); play(); }
+      startX = null;
+    }, {passive:true});
+
+    // init
+    slides[0].classList.add('is-active');
+    dots[0].classList.add('is-active'); dots[0].setAttribute('aria-selected','true');
+    boxes[0].classList.add('is-active'); // ensure first popup shows
+    play();
+  })();
+  </script>
+</body>
+</html>
